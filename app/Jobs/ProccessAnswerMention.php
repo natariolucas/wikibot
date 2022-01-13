@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\Tweets;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -19,7 +20,7 @@ class ProccessAnswerMention implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(array $tweet)
+    public function __construct(Tweets $tweet)
     {
         $this->tweet = $tweet;
     }
@@ -29,8 +30,8 @@ class ProccessAnswerMention implements ShouldQueue
      *
      * @return void
      */
-    public function handle(array $tweet)
+    public function handle()
     {
-
+        var_dump('Processing tweet', $this->tweet);
     }
 }

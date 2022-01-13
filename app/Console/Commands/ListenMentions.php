@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Jobs\ProccessAnswerMention;
+use App\Models\Tweets;
 use Atymic\Twitter\Facade\Twitter;
 use Illuminate\Console\Command;
 
@@ -62,8 +63,9 @@ class ListenMentions extends Command
                 return;
             }
 
-            /** Extract the tweet text */
+            /** Extract the tweet info */
             $tweetText = $tweetArray['data']['text'];
+            $twitterUserId = $tweetArray['data']['author_id'];
 
             /** Proccess tweet text with the predefined regex pattern to obtain the term to search*/
             preg_match($this->termToSearchPattern, $tweetText, $termMatch);
@@ -72,7 +74,14 @@ class ListenMentions extends Command
             /** Verify if there is any term to search */
             if (!empty($termToSearch)) {
                 $this->info("Term to search: " . $termToSearch);
-                ProccessAnswerMention::dispatch($tweetArray)->onQueue('answer-mention');
+
+                $tweetInstance = Tweets::create([
+                    'twitter_user_id' => $twitterUserId,
+                    'term_to_search' => $termToSearch,
+                    'data' => $tweet
+                ]);
+
+                ProccessAnswerMention::dispatch($tweetInstance)->onQueue('answer-mention');
             }
             else {
                 $this->info("No term to search in this tweet");
