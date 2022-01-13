@@ -59,7 +59,6 @@ class ListenMentions extends Command
             /** Verify if it is a hearthbeat to keep alive the stream */
             if (empty($tweetArray)) {
                 $this->info("hearthbeat");
-                ProccessAnswerMention::dispatch(["TEST" => "HEARTHBEAT"])->onQueue("testQueue")->delay(now()->addMinutes(1));
                 return;
             }
 

@@ -29,8 +29,8 @@ class ProccessAnswerMention implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(array $tweet)
     {
-        file_put_contents("test_job.txt", json_encode($this->tweet), FILE_APPEND);
+
     }
 }
