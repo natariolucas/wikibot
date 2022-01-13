@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\ProccessAnswerMention;
 use Atymic\Twitter\Facade\Twitter;
 use Illuminate\Console\Command;
 
@@ -58,6 +59,7 @@ class ListenMentions extends Command
             /** Verify if it is a hearthbeat to keep alive the stream */
             if (empty($tweetArray)) {
                 $this->info("hearthbeat");
+                ProccessAnswerMention::dispatch(["TEST" => "HEARTHBEAT"])->onQueue("testQueue")->delay(now()->addMinutes(1));
                 return;
             }
 
@@ -69,10 +71,13 @@ class ListenMentions extends Command
             $termToSearch = $termMatch['term'] ?? null;
 
             /** Verify if there is any term to search */
-            if (!empty($termToSearch))
+            if (!empty($termToSearch)) {
                 $this->info("Term to search: " . $termToSearch);
-            else
+                ProccessAnswerMention::dispatch($tweetArray)->onQueue('answer-mention');
+            }
+            else {
                 $this->info("No term to search in this tweet");
+            }
 
         },
             $this->paramsResponse
