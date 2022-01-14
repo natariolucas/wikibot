@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Jobs\ProccessAnswerMention;
+use App\Jobs\ProccessWikiSearch;
 use App\Models\Tweets;
 use Atymic\Twitter\Facade\Twitter;
 use Illuminate\Console\Command;
@@ -52,43 +52,46 @@ class ListenMentions extends Command
      */
     public function handle()
     {
-        Twitter::getStream(function ($tweet) {
+        try {
+            Twitter::getStream(function ($tweet) {
 
-            /** Decode tweet JSON to array */
-            $tweetArray = json_decode(utf8_decode($tweet), true);
+                /** Decode tweet JSON to array */
+                $tweetArray = json_decode(utf8_decode($tweet), true);
 
-            /** Verify if it is a hearthbeat to keep alive the stream */
-            if (empty($tweetArray)) {
-                $this->info("hearthbeat");
-                return;
-            }
+                /** Verify if it is a hearthbeat to keep alive the stream */
+                if (empty($tweetArray)) {
+                    $this->info("hearthbeat");
+                    return;
+                }
 
-            /** Extract the tweet info */
-            $tweetText = $tweetArray['data']['text'];
-            $twitterUserId = $tweetArray['data']['author_id'];
+                /** Extract the tweet info */
+                $tweetText = $tweetArray['data']['text'];
+                $twitterUserId = $tweetArray['data']['author_id'];
 
-            /** Proccess tweet text with the predefined regex pattern to obtain the term to search*/
-            preg_match($this->termToSearchPattern, $tweetText, $termMatch);
-            $termToSearch = $termMatch['term'] ?? null;
+                /** Proccess tweet text with the predefined regex pattern to obtain the term to search*/
+                preg_match($this->termToSearchPattern, $tweetText, $termMatch);
+                $termToSearch = $termMatch['term'] ?? null;
 
-            /** Verify if there is any term to search */
-            if (!empty($termToSearch)) {
-                $this->info("Term to search: " . $termToSearch);
+                /** Verify if there is any term to search */
+                if (!empty($termToSearch)) {
+                    $this->info("Term to search: " . $termToSearch);
 
-                $tweetInstance = Tweets::create([
-                    'twitter_user_id' => $twitterUserId,
-                    'term_to_search' => $termToSearch,
-                    'data' => $tweet
-                ]);
+                    $tweetInstance = Tweets::create([
+                        'twitter_user_id' => $twitterUserId,
+                        'term_to_search' => $termToSearch,
+                        'data' => $tweet
+                    ]);
 
-                ProccessAnswerMention::dispatch($tweetInstance)->onQueue('answer-mention');
-            }
-            else {
-                $this->info("No term to search in this tweet");
-            }
+                    ProccessWikiSearch::dispatch($tweetInstance)->onQueue('wiki-search');
+                } else {
+                    $this->info("No term to search in this tweet");
+                }
 
-        },
-            $this->paramsResponse
-        );
+            },
+                $this->paramsResponse
+            );
+        } catch (\Throwable $e) {
+            $this->info("error al crear stream");
+        }
     }
 }

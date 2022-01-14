@@ -25,7 +25,7 @@ class WikipediaApi extends Controller
 
         $response = $client->request('GET', $uri, []);
         $responseBody = (string) $response->getBody();
-        $responseBodyDecoded = json_decode($responseBody);
+        $responseBodyDecoded = json_decode($responseBody, true);
 
         if(!empty($responseBodyDecoded))
             return $responseBodyDecoded;
