@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Http\Controllers\WikipediaApi;
 use App\Models\Tweets;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -32,6 +33,8 @@ class ProccessAnswerMention implements ShouldQueue
      */
     public function handle()
     {
-        var_dump('Processing tweet', $this->tweet);
+        $api = new WikipediaApi();
+        $termToSearch = $this->tweet->getAttribute('term_to_search');
+        $api->searchPageSnippet($termToSearch);
     }
 }
