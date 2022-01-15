@@ -17,7 +17,7 @@ class CreateTweetsTable extends Migration
             $table->id();
             $table->string('twitter_user_id');
             $table->string('term_to_search');
-            $table->json('data');
+            $table->text('data');
             $table->timestamps();
         });
     }
