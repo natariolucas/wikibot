@@ -18,12 +18,13 @@ class ListenMentions extends Command
 
     private $paramsResponse =
         [
-            "tweet.fields" => "attachments,author_id,context_annotations,conversation_id,created_at,entities,geo,id,in_reply_to_user_id,lang," .
-                "public_metrics,possibly_sensitive,referenced_tweets,reply_settings,source,text,withheld"
+            "tweet.fields" => "author_id,context_annotations,conversation_id,created_at,id,in_reply_to_user_id,lang," .
+                "referenced_tweets,reply_settings,source,text,withheld"
             ,
             "user.fields" =>
-                "created_at,description,entities,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username," .
-                "verified,withheld"
+                "id,protected,public_metrics,url,username," .
+                "verified,withheld",
+            "expansions" => "author_id"
 
         ];
 
@@ -67,6 +68,7 @@ class ListenMentions extends Command
             $tweetText = $tweetArray['data']['text'];
             $twitterUserId = $tweetArray['data']['author_id'];
             $tweetId = $tweetArray['data']['id'];
+            $username = $tweetArray['includes']['users'][0]['username'];
             /** Proccess tweet text with the predefined regex pattern to obtain the term to search*/
             preg_match($this->termToSearchPattern, $tweetText, $termMatch);
             $termToSearch = $termMatch['term'] ?? null;
@@ -77,6 +79,7 @@ class ListenMentions extends Command
 
                 $tweetInstance = Tweets::create([
                     'tweet_id' => $tweetId,
+                    'twitter_username' => $username,
                     'twitter_user_id' => $twitterUserId,
                     'term_to_search' => $termToSearch,
                     'data' => $tweet

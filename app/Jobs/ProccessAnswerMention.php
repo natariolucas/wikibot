@@ -42,7 +42,13 @@ class ProccessAnswerMention implements ShouldQueue
         if (empty($dirtyWikipediaContent))
             return;
 
-        $prefixAnswer = "¡Hola! Encontre esta info: ";
+        $username = $this->tweet->getAttribute('twitter_username');
+        $tweetId = $this->tweet->getAttribute('tweet_id');
+        if(empty($username)) {
+            var_dump('Empty username on tweet ' . $tweetId);
+            return;
+        }
+        $prefixAnswer = "Encontre esto @$username : ";
         $cleanedWikipediaContent = strip_tags($dirtyWikipediaContent);
         $wikipediaContentLengthToTweet = $this->maxTweetChars - strlen($prefixAnswer);
         $truncatedWikipediaContent = $this->truncateText($cleanedWikipediaContent, $wikipediaContentLengthToTweet);
@@ -50,7 +56,7 @@ class ProccessAnswerMention implements ShouldQueue
 
         $paramTweet = [
             "status" => $answer,
-            "in_reply_to_status_id" => $this->tweet->getAttribute('tweet_id')
+            "in_reply_to_status_id" => $tweetId
         ];
 
         var_dump('Replying to tweet '.$paramTweet['in_reply_to_status_id']);
