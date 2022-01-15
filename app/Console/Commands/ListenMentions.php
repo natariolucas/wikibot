@@ -28,7 +28,7 @@ class ListenMentions extends Command
 
         ];
 
-    private $termToSearchPattern = '/"(?<term>[a-zA-z0-9]+)"/';
+    private $termToSearchPattern = '/"(?<term>( *[a-zA-z0-9] *)+)"/';
     /**
      * The console command description.
      *
