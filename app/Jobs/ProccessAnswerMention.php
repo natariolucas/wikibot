@@ -50,7 +50,7 @@ class ProccessAnswerMention implements ShouldQueue
 
         $paramTweet = [
             "status" => $answer,
-            "in_reply_to_status_id" => $this->tweet->getAttribute('id')
+            "in_reply_to_status_id" => $this->tweet->getAttribute('tweet_id')
         ];
         Twitter::forApiV1()->postTweet($paramTweet);
     }

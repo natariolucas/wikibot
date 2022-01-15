@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\TwitterController;
 use Atymic\Twitter\Facade\Twitter;
 use Illuminate\Support\Facades\Route;
 
@@ -17,3 +18,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
+    return view('dashboard');
+})->name('dashboard');
+
+Route::get('auth/twitter', [TwitterController::class, 'loginwithTwitter']);
+Route::get('auth/callback/twitter', [TwitterController::class, 'cbTwitter']);
